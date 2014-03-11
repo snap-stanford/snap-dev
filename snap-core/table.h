@@ -23,6 +23,12 @@ typedef TPair<TIntV, TFltV> TGroupKey;
 //TODO: move to separate file (map.h / file with PR and HITS) 
 namespace TSnap {
 
+  /// convert list of graphs to tables given a pointer map function and the list of arguments to it
+  template <class PGraph>
+  TVec<PTable> MapGraphToTable(const TVec<PGraph>& GraphSeq, 
+    TTableContext& Context, const TStr& TableNamePrefix, 
+    PTable (*MapFunc) (PGraph, TTableContext&, const TStr&, va_list), ...);
+
   /// Get sequence of PageRank tables from given \c GraphSeq into \c TableSeq
   template <class PGraph>
   void MapPageRank(const TVec<PGraph>& GraphSeq, TVec<PTable>& TableSeq, 
@@ -1107,6 +1113,41 @@ public:
 typedef TPair<TStr,TAttrType> TStrTypPr;
 
 namespace TSnap {
+
+  /// converts vector of graphs to vector of tables
+  /// map function should take a graph and define how to convert it into a table
+  template <class PGraph>
+  TVec<PTable> MapGraphToTable(const TVec<PGraph>& GraphSeq, 
+    TTableContext& Context, const TStr& TableNamePrefix, 
+    PTable (*MapFunc) (PGraph, TTableContext&, const TStr&, va_list), ...) {
+
+    TVec<PTable> Ret;
+    for (TInt i = 0; i < GraphSeq.Len(); i++) {
+      va_list args;
+      va_start(args, MapFunc);
+
+      PTable Val = MapFunc(GraphSeq[i], Context, TableNamePrefix + "_" + i.GetStr(), args);
+      Ret.Add(Val);
+
+      va_end(args);
+    }
+    return Ret;
+  }
+
+  /// constructs a page rank table for a graph
+  template <class PGraph>
+  PTable GetPageRankTableForGraph(PGraph Graph, 
+    TTableContext& Context, const TStr& TableNamePrefix,
+    va_list args) {
+
+    double C = va_arg(args, double);
+    double Eps = va_arg(args, double);
+    int MaxIter = va_arg(args, int);
+    TIntFltH PRankH;
+
+    GetPageRank(Graph, PRankH, C, Eps, MaxIter);
+    return TTable::TableFromHashMap(TableNamePrefix, PRankH, "NodeId", "PageRank", Context, false);
+  }
 
   /// Get sequence of PageRank tables from given \c GraphSeq into \c TableSeq
   template <class PGraph>
