@@ -686,10 +686,10 @@ void TTable::GetPartitionRanges(TIntPrV& Partitions, TInt NumPartitions) const {
     PartitionSize = 10;
     NumPartitions = NumValidRows / PartitionSize; 
   }
-  double startResize = omp_get_wtime();
+  //double startResize = omp_get_wtime();
   Partitions.Reserve(NumPartitions+1);
-  double endResize = omp_get_wtime();
-  printf("Partition: Resize time = %f\n", endResize-startResize);
+  //double endResize = omp_get_wtime();
+  //printf("Partition: Resize time = %f\n", endResize-startResize);
 
   TInt currRow = FirstValidRow;
   TInt currStart = currRow;
@@ -716,7 +716,7 @@ void TTable::GetPartitionRanges(TIntPrV& Partitions, TInt NumPartitions) const {
     }
     Partitions.Add(TIntPr(currStart, TTable::Last));
   }
-  printf("Num partitions: %d\n", Partitions.Len());
+  //printf("Num partitions: %d\n", Partitions.Len());
 }
 
 /*****  Grouping Utility functions ****/
