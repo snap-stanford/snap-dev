@@ -1,5 +1,5 @@
 enum algo_t {ALGO_ONE, ALGO_TWO}; // Rok version, Pararth version
-algo_t CONVERSION_ALGO = ALGO_ONE;
+algo_t CONVERSION_ALGO = ALGO_TWO;
 
 enum graph_t {LIVEJOURNAL, TWITTER};
 graph_t GRAPH = LIVEJOURNAL;
